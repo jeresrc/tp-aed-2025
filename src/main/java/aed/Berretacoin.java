@@ -10,7 +10,7 @@ public class Berretacoin<T extends Comparable<T>> {
   private int cant_bloques;
 
   private ListaEnlazada<Transaccion> transacciones_copia;
-  private int[] saldo; //
+  private int[] saldos;
   private ArrayList<Handle<ListaEnlazada<Transaccion>.Nodo>> lista_de_handles;
 
   public static class Handle<Nodo> {
@@ -35,7 +35,7 @@ public class Berretacoin<T extends Comparable<T>> {
 
     ArrayList<Usuario> lista_usuarios = new ArrayList<>();
 
-    this.saldo = new int[n_usuarios];
+    this.saldos = new int[n_usuarios];
     for (int i = 0; i < n_usuarios; i++) { // O(p)
       Usuario user = new Usuario(i + 1, 0);
       lista_usuarios.add(user);
@@ -48,6 +48,7 @@ public class Berretacoin<T extends Comparable<T>> {
   public void agregarBloque(Transaccion[] transacciones) {
     this.ultimo_bloque = new Heap<>();
     this.monto_bloque = 0;
+
     ArrayList<Transaccion> trans = new ArrayList<>();
     this.transacciones_copia = new ListaEnlazada<>();
     this.lista_de_handles = new ArrayList<Handle<ListaEnlazada<Transaccion>.Nodo>>(transacciones.length);
@@ -62,22 +63,22 @@ public class Berretacoin<T extends Comparable<T>> {
       lista_de_handles.add(new Handle<ListaEnlazada<Transaccion>.Nodo>(nodo));
 
       if (comprador != 0) {
-        Usuario handle_c = new Usuario(comprador, saldo[comprador - 1]);
+        Usuario handle_c = new Usuario(comprador, saldos[comprador - 1]);
         Heap.Handle<Usuario> handleComprador = Usuario.getHandle(handle_c);
         Usuario usuarioComprador = handleComprador.valor();
         Usuario actualizado_c = new Usuario(usuarioComprador.usuario(), usuarioComprador.saldo() - monto);
 
         Usuario.actualizar(handleComprador, actualizado_c);
-        saldo[comprador - 1] -= monto;
+        saldos[comprador - 1] -= monto;
       }
 
-      Usuario handle_v = new Usuario(vendedor, saldo[vendedor - 1]);
+      Usuario handle_v = new Usuario(vendedor, saldos[vendedor - 1]);
       Heap.Handle<Usuario> handleVendedor = Usuario.getHandle(handle_v);
       Usuario usuarioVendedor = handleVendedor.valor();
       Usuario actualizado_v = new Usuario(usuarioVendedor.usuario(), usuarioVendedor.saldo() + monto);
       Usuario.actualizar(handleVendedor, actualizado_v);
 
-      saldo[vendedor - 1] += monto;
+      saldos[vendedor - 1] += monto;
 
       trans.add(tx);
       if (cant_bloques >= 3000 && comprador != 0) {
@@ -136,22 +137,22 @@ public class Berretacoin<T extends Comparable<T>> {
 
     if (maximo.id_comprador() != 0) {
 
-      Usuario hande_c = new Usuario(maximo.id_comprador(), saldo[(maximo.id_comprador()) - 1]);
+      Usuario hande_c = new Usuario(maximo.id_comprador(), saldos[(maximo.id_comprador()) - 1]);
       Heap.Handle<Usuario> handleComprador = Usuario.getHandle(hande_c);
       Usuario usuario_comprador = handleComprador.valor();
       Usuario actualizado_c = new Usuario(usuario_comprador.usuario(), usuario_comprador.saldo() + maximo.monto());
 
       Usuario.actualizar(handleComprador, actualizado_c); // O(log p)
 
-      saldo[(maximo.id_comprador()) - 1] += maximo.monto();
+      saldos[(maximo.id_comprador()) - 1] += maximo.monto();
     }
 
-    Usuario hande_v = new Usuario(maximo.id_vendedor(), saldo[(maximo.id_vendedor()) - 1]);
+    Usuario hande_v = new Usuario(maximo.id_vendedor(), saldos[(maximo.id_vendedor()) - 1]);
     Heap.Handle<Usuario> handleVendedor = Usuario.getHandle(hande_v);
     Usuario usuario_vendedor = handleVendedor.valor();
     Usuario actualizado_v = new Usuario(usuario_vendedor.usuario(), usuario_vendedor.saldo() - maximo.monto());
     Usuario.actualizar(handleVendedor, actualizado_v); // O(log p)
-    saldo[(maximo.id_vendedor()) - 1] -= maximo.monto();
+    saldos[(maximo.id_vendedor()) - 1] -= maximo.monto();
 
     monto_bloque -= maximo.monto();
 
