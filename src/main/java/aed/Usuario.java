@@ -41,15 +41,12 @@ public class Usuario implements Comparable<Usuario> {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o)
+  public boolean equals(Object obj) {
+    if (this == obj)
       return true;
-
-    if (o == null || getClass() != o.getClass())
+    if (obj == null || getClass() != obj.getClass())
       return false;
-
-    Usuario otro = (Usuario) o;
-
-    return this.usuario() == otro.usuario(); // comparás solo por ID
+    Usuario usuario = (Usuario) obj;
+    return id == usuario.id;
   }
 }

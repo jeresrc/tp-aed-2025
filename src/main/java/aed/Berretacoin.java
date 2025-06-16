@@ -11,7 +11,7 @@ public class Berretacoin<T extends Comparable<T>> {
 
   private ListaEnlazada<Transaccion> transacciones_copia;
   private int[] saldo; //
-  private ArrayList<Handle<ListaEnlazada.Nodo>> lista_de_handles;
+  private ArrayList<Handle<ListaEnlazada<Transaccion>.Nodo>> lista_de_handles;
 
   public static class Handle<Nodo> {
     private Nodo valor;
@@ -30,102 +30,96 @@ public class Berretacoin<T extends Comparable<T>> {
   }
 
   public Berretacoin(int n_usuarios) {// Loop de O(p) + heapify O(p) = O(p)
-    this.monto_bloque = 0; // Al no haber bloques todavia, no hay transaciones por lo que el monto es cero
-    this.cant_bloques = 0; // Al arrancar mi Berretacoin mi cant bloques es cero
+    this.monto_bloque = 0;
+    this.cant_bloques = 0;
 
     ArrayList<Usuario> lista_usuarios = new ArrayList<>();
 
     this.saldo = new int[n_usuarios];
     for (int i = 0; i < n_usuarios; i++) { // O(p)
-      Usuario user = new Usuario(i + 1, 0); // O(1)
+      Usuario user = new Usuario(i + 1, 0);
       lista_usuarios.add(user);
     }
 
-    this.Usuario = new Heap<>(); // Inicio mi heap Usarios, donde voy a guardar el saldo de cada usuario, O(1)
-    Usuario.heapify(lista_usuarios); // Convierto mi lista_usuarios en un heap con complejidad Linneal Tq = O(n)
+    this.Usuario = new Heap<>();
+    Usuario.heapify(lista_usuarios); // O(n)
   }
 
-  public void agregarBloque(Transaccion[] transacciones) {// Itera nb transacciones, y hace heap.actualizar O(log p) dos
-                                                          // veces por transacción
-    this.ultimo_bloque = new Heap<>(); // Nuevo bloque por lo que borro el anterior heap y inicio denuevo, O(1)
-    this.monto_bloque = 0; // Arranco un nuevo bloque por lo que reinicio el monto bloque
-    ArrayList<Transaccion> trans = new ArrayList<>(); // Creo un ArrayList para guardar todas las transaciones del
-                                                      // bloque, O(1)
+  public void agregarBloque(Transaccion[] transacciones) {
+    this.ultimo_bloque = new Heap<>();
+    this.monto_bloque = 0;
+    ArrayList<Transaccion> trans = new ArrayList<>();
     this.transacciones_copia = new ListaEnlazada<>();
-    this.lista_de_handles = new ArrayList<Handle<ListaEnlazada.Nodo>>(transacciones.length);
+    this.lista_de_handles = new ArrayList<Handle<ListaEnlazada<Transaccion>.Nodo>>(transacciones.length);
 
-    for (int i = 0; i < transacciones.length; i++) { // O(nb)
-      Transaccion tx = transacciones[i]; // O(1)
-      int comprador = tx.id_comprador(); // O(1)
-      int vendedor = tx.id_vendedor(); // O(1)
-      int monto = tx.monto(); // O(1)
+    for (int i = 0; i < transacciones.length; i++) {
+      Transaccion tx = transacciones[i];
+      int comprador = tx.id_comprador();
+      int vendedor = tx.id_vendedor();
+      int monto = tx.monto();
 
-      ListaEnlazada.Nodo nodo = transacciones_copia.agregarAtrasAux(tx);
-      lista_de_handles.add(new Handle<ListaEnlazada.Nodo>(nodo));
+      ListaEnlazada<Transaccion>.Nodo nodo = transacciones_copia.agregarAtrasAux(tx);
+      lista_de_handles.add(new Handle<ListaEnlazada<Transaccion>.Nodo>(nodo));
 
-      if (comprador != 0) { // Si el comprador no es el sistema (id_comprador == 0) //O(1)
-        Usuario handle_c = new Usuario(comprador, saldo[comprador - 1]); // O(1)
-        Heap.Handle<Usuario> handleComprador = Usuario.getHandle(handle_c); // Obtener el handle del comprador //O(1)
-        Usuario usuarioComprador = handleComprador.valor(); // Obtengo el monto del comprador en el handle //O(1)
-        Usuario actualizado_c = new Usuario(usuarioComprador.usuario(), usuarioComprador.saldo() - monto); // O(1)
-        Usuario.actualizar(handleComprador, actualizado_c); // Reordenar el heap con el nuevo monto del comprador
-                                                            // //O(log p)
-        saldo[comprador - 1] -= monto; // O(1)
+      if (comprador != 0) {
+        Usuario handle_c = new Usuario(comprador, saldo[comprador - 1]);
+        Heap.Handle<Usuario> handleComprador = Usuario.getHandle(handle_c);
+        Usuario usuarioComprador = handleComprador.valor();
+        Usuario actualizado_c = new Usuario(usuarioComprador.usuario(), usuarioComprador.saldo() - monto);
+
+        Usuario.actualizar(handleComprador, actualizado_c);
+        saldo[comprador - 1] -= monto;
       }
 
-      // Actualizar el saldo del vendedor
-      Usuario handle_v = new Usuario(vendedor, saldo[vendedor - 1]); // O(1)
-      Heap.Handle<Usuario> handleVendedor = Usuario.getHandle(handle_v); // Obtener el handle del vendedor //O(1)
-      Usuario usuarioVendedor = handleVendedor.valor(); // Obtengo el monto del vendedor en el handle //O(1)
-      // usuarioVendedor.setSaldo(usuarioVendedor.saldo() + monto); // Actualizo el
-      // monto vendedor
-      Usuario actualizado_v = new Usuario(usuarioVendedor.usuario(), usuarioVendedor.saldo() + monto); // O(1)
-      Usuario.actualizar(handleVendedor, actualizado_v); // Reordenar el heap con el nuevo monto del vendedor //O(log
-                                                         // p)
+      Usuario handle_v = new Usuario(vendedor, saldo[vendedor - 1]);
+      Heap.Handle<Usuario> handleVendedor = Usuario.getHandle(handle_v);
+      Usuario usuarioVendedor = handleVendedor.valor();
+      Usuario actualizado_v = new Usuario(usuarioVendedor.usuario(), usuarioVendedor.saldo() + monto);
+      Usuario.actualizar(handleVendedor, actualizado_v);
 
-      saldo[vendedor - 1] += monto; // O(1)
+      saldo[vendedor - 1] += monto;
 
-      trans.add(tx); // O(1)
+      trans.add(tx);
       if (cant_bloques >= 3000 && comprador != 0) {
-        monto_bloque += transacciones[i].monto(); // O(1)
+        monto_bloque += transacciones[i].monto();
       }
     }
 
     if (cant_bloques < 3000) {
-      for (int p = 1; p < transacciones.length; p++) { // O(n-1)
+      for (int p = 1; p < transacciones.length; p++) {
         monto_bloque += transacciones[p].monto();
       }
     }
 
-    this.ultimo_bloque.heapify(trans); // Convierto mi trans en un heap con complejidad Linneal tq : O(n)
-    this.cant_bloques++; // Sumo 1 a la cantidad de bloques de mi Berretacoin //O(1)
+    this.ultimo_bloque.heapify(trans); // Convierto mi trans en un heap con complejidad Lineal O(n)
+    this.cant_bloques++;
 
   }
 
-  public Transaccion txMayorValorUltimoBloque() { // Devuelve raíz del heap ultimo_bloque, O(1)
+  public Transaccion txMayorValorUltimoBloque() {
     return this.ultimo_bloque.verMax();
   }
 
-  public Transaccion[] txUltimoBloque() {// Recorre la lista enlazada una sola vez, O(nb)
+  public Transaccion[] txUltimoBloque() {
 
     Transaccion[] res = new Transaccion[transacciones_copia.longitud()];
     ListaEnlazada<Transaccion>.Nodo actual = transacciones_copia.primeroNodo();
     int i = 0;
     while (actual != null) {
       res[i] = actual.valor;
-      actual = actual.sig;
+      actual = actual.next;
       i++;
     }
 
     return res;
   }
 
-  public int maximoTenedor() {// Devuelve el máximo del heap de Usuario, O(1)
-    Usuario maximo_usuario = this.Usuario.verMax(); // Guardo el id_usuario y el saldo del usuario con mayor saldo
-    return maximo_usuario.usuario(); // Devuelvo el id del usuario con mayor saldo
+  public int maximoTenedor() {
+    Usuario maximo_usuario = this.Usuario.verMax();
+    return maximo_usuario.usuario();
   }
 
-  public int montoMedioUltimoBloque() {// Accede a una suma ya calculada y la divide, O(1)
+  public int montoMedioUltimoBloque() {
     int cardinal = ultimo_bloque.cardinal();
     if (cardinal == 0) {
       return 0;
@@ -138,10 +132,10 @@ public class Berretacoin<T extends Comparable<T>> {
 
   public void hackearTx() { // Elimina max del heap (O(log nb)) y actualiza dos heaps (O(log p) c/u)
 
-    Transaccion maximo = ultimo_bloque.verMax(); // O(1)
+    Transaccion maximo = ultimo_bloque.verMax();
     ultimo_bloque.eliminarMax(); // O(log nb)
 
-    if (maximo.id_comprador() > 0) {
+    if (maximo.id_comprador() != 0) {
 
       Usuario hande_c = new Usuario(maximo.id_comprador(), saldo[(maximo.id_comprador()) - 1]);
       Heap.Handle<Usuario> handleComprador = Usuario.getHandle(hande_c);
@@ -162,8 +156,8 @@ public class Berretacoin<T extends Comparable<T>> {
 
     monto_bloque -= maximo.monto();
 
-    Handle<ListaEnlazada.Nodo> handleDelNodo = lista_de_handles.get(maximo.id());
-    ListaEnlazada.Nodo nodoAeliminar = handleDelNodo.valor();
+    Handle<ListaEnlazada<Transaccion>.Nodo> handleDelNodo = lista_de_handles.get(maximo.id());
+    ListaEnlazada<Transaccion>.Nodo nodoAeliminar = handleDelNodo.valor();
     transacciones_copia.eliminarPorNodo(nodoAeliminar);
   }
 }

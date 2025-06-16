@@ -11,9 +11,6 @@ public class Heap<T extends Comparable<T>> {
     handles = new ArrayList<>();
   }
 
-  /**
-   * Devuelve verdadero si el heap está vacío.
-   */
   public boolean esVacio() {
     return elementos.isEmpty();
   }
@@ -22,7 +19,7 @@ public class Heap<T extends Comparable<T>> {
     return handles.get(indice);
   }
 
-  public int hijoderecho(int i) {
+  public int hijoDerecho(int i) {
     return (2 * i) + 2;
   }
 
@@ -36,7 +33,7 @@ public class Heap<T extends Comparable<T>> {
     return null;
   }
 
-  public int hijoizquierdo(int i) {
+  public int hijoIzquierdo(int i) {
     return (2 * i) + 1;
   }
 
@@ -44,16 +41,10 @@ public class Heap<T extends Comparable<T>> {
     return (i - 1) / 2;
   }
 
-  /**
-   * Devuelve la cantidad de elementos en el heap.
-   */
   public int cardinal() {
     return elementos.size();
   }
 
-  /**
-   * Devuelve el elemento máximo (raíz del heap), sin eliminarlo.
-   */
   public T verMax() {
     if (elementos == null) {
       return null;
@@ -63,9 +54,6 @@ public class Heap<T extends Comparable<T>> {
 
   }
 
-  /**
-   * Inserta un nuevo elemento en el heap y retorna su handle asociado.
-   */
   public Handle<T> insertar(T valor) {
     elementos.add(valor);
     Handle<T> h = new Handle<>(valor, elementos.size() - 1);
@@ -74,9 +62,6 @@ public class Heap<T extends Comparable<T>> {
     return h;
   }
 
-  /**
-   * Elimina y devuelve el elemento máximo del heap.
-   */
   public T eliminarMax() {
     if (esVacio())
       return null;
@@ -93,9 +78,6 @@ public class Heap<T extends Comparable<T>> {
     return max;
   }
 
-  /**
-   * Convierte una lista de elementos en un heap en O(n).
-   */
   public void heapify(ArrayList<T> lista) {
     elementos = new ArrayList<>(lista);
     handles = new ArrayList<>();
@@ -109,16 +91,11 @@ public class Heap<T extends Comparable<T>> {
     }
   }
 
-  /**
-   * Actualiza el valor asociado a un handle y reordena el heap según sea
-   * necesario.
-   */
   public void actualizar(Handle<T> handle, T nuevoValor) {
     int i = handle.posicion();
     T viejoValor = elementos.get(i);
     handles.get(i).actualizarValor(nuevoValor);
     elementos.set(i, nuevoValor);
-    // handle.actualizarValor(nuevoValor);
 
     if (nuevoValor.compareTo(viejoValor) > 0) {
       siftUp(i);
@@ -127,12 +104,9 @@ public class Heap<T extends Comparable<T>> {
     }
   }
 
-  /**
-   * Reordena hacia arriba el elemento en la posición i.
-   */
   private void siftUp(int i) {
     while (i > 0) {
-      int padre = padre(i); // Remplazar por le nuevo public padre
+      int padre = padre(i);
       if (elementos.get(i).compareTo(elementos.get(padre)) > 0) {
         swap(i, padre);
         i = padre;
@@ -142,15 +116,12 @@ public class Heap<T extends Comparable<T>> {
     }
   }
 
-  /**
-   * Reordena hacia abajo el elemento en la posición i.
-   */
   private void siftDown(int i) {
     int n = elementos.size();
     while (true) {
       int max = i;
-      int izq = hijoizquierdo(i); // Remplazar por el public hijoIzquierdo
-      int der = hijoderecho(i); // Remplazar por el public hijoDerecho
+      int izq = hijoIzquierdo(i);
+      int der = hijoDerecho(i);
 
       if (izq < n && elementos.get(izq).compareTo(elementos.get(max)) > 0) {
         max = izq;
@@ -167,10 +138,6 @@ public class Heap<T extends Comparable<T>> {
     }
   }
 
-  /**
-   * Intercambia los elementos en las posiciones i y j, actualizando también los
-   * handles.
-   */
   private void swap(int i, int j) {
     T tempElemento = elementos.get(i);
     elementos.set(i, elementos.get(j));
@@ -184,9 +151,6 @@ public class Heap<T extends Comparable<T>> {
     hj.actualizarPosicion(i);
   }
 
-  /**
-   * Clase interna que representa un puntero a un elemento dentro del heap.
-   */
   public static class Handle<T> {
     private T valor;
     private int posicion;

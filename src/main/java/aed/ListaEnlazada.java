@@ -7,13 +7,13 @@ public class ListaEnlazada<T> implements Secuencia<T> {
 
   public class Nodo {
     T valor;
-    Nodo sig;
-    Nodo ant;
+    Nodo next;
+    Nodo prev;
 
     public Nodo(T v) {
       valor = v;
-      sig = null;
-      ant = null;
+      next = null;
+      prev = null;
     }
   }
 
@@ -37,7 +37,7 @@ public class ListaEnlazada<T> implements Secuencia<T> {
     }
 
     else {
-      nuevo.sig = primero;
+      nuevo.next = primero;
       primero = nuevo;
       largo += 1;
     }
@@ -50,14 +50,11 @@ public class ListaEnlazada<T> implements Secuencia<T> {
       primero = nuevo;
       ultimo = nuevo;
     } else {
-      ultimo.sig = nuevo;
-      nuevo.ant = ultimo;
+      ultimo.next = nuevo;
+      nuevo.prev = ultimo;
       ultimo = nuevo;
     }
     largo++;
-
-    // Si el elemento es Transaccion, guardo la referencia al nodo
-
   }
 
   public Nodo primeroNodo() {
@@ -70,22 +67,19 @@ public class ListaEnlazada<T> implements Secuencia<T> {
       primero = nuevo;
       ultimo = nuevo;
     } else {
-      ultimo.sig = nuevo;
-      nuevo.ant = ultimo;
+      ultimo.next = nuevo;
+      nuevo.prev = ultimo;
       ultimo = nuevo;
     }
 
     largo++;
-
-    // Si el elemento es Transaccion, guardo la referencia al nodo
-
     return nuevo;
   }
 
   public T obtener(int i) { // O(n)
     Nodo actual = primero;
     for (int j = 0; j < i; j++) {
-      actual = actual.sig;
+      actual = actual.next;
     }
 
     return actual.valor;
@@ -96,24 +90,24 @@ public class ListaEnlazada<T> implements Secuencia<T> {
       throw new UnsupportedOperationException("No se puede eliminar este nodo");
     }
 
-    Nodo anterior = nodo.ant;
-    Nodo proximo = nodo.sig;
+    Nodo anterior = nodo.prev;
+    Nodo proximo = nodo.next;
 
     if (nodo == primero && nodo == ultimo) {
       primero = null;
       ultimo = null;
     } else if (nodo == primero) {
-      primero = nodo.sig;
+      primero = nodo.next;
       if (primero != null)
-        primero.ant = null;
+        primero.prev = null;
     } else if (nodo == ultimo) {
-      ultimo = nodo.ant;
+      ultimo = nodo.prev;
       if (ultimo != null)
-        ultimo.sig = null;
+        ultimo.next = null;
     } else {
-      anterior.sig = proximo;
+      anterior.next = proximo;
       if (proximo != null)
-        proximo.ant = anterior;
+        proximo.prev = anterior;
     }
 
     largo--;
@@ -124,12 +118,12 @@ public class ListaEnlazada<T> implements Secuencia<T> {
     Nodo prev = primero;
     for (int j = 0; j < i; j++) {
       prev = actual;
-      actual = actual.sig;
+      actual = actual.next;
     }
     if (i == 0) {
-      primero = actual.sig;
+      primero = actual.next;
     } else {
-      prev.sig = actual.sig;
+      prev.next = actual.next;
     }
     largo = largo - 1;
 
@@ -138,7 +132,7 @@ public class ListaEnlazada<T> implements Secuencia<T> {
   public void modificarPosicion(int indice, T elem) {
     Nodo actual = primero;
     for (int j = 0; j < indice; j++) {
-      actual = actual.sig;
+      actual = actual.next;
     }
     actual.valor = elem;
 
@@ -148,7 +142,7 @@ public class ListaEnlazada<T> implements Secuencia<T> {
     Nodo actual = lista.primero;
     while (actual != null) {
       agregarAtras(actual.valor);
-      actual = actual.sig;
+      actual = actual.next;
     }
   }
 
@@ -157,32 +151,32 @@ public class ListaEnlazada<T> implements Secuencia<T> {
     Nodo actual = primero;
     StringBuilder l = new StringBuilder();
     while (actual != null) {
-      if (actual.sig == null) {
+      if (actual.next == null) {
         l.append(actual.valor + "]");
       } else if (actual == primero) {
         l.append("[" + actual.valor + ", ");
       } else {
         l.append(actual.valor + ", ");
       }
-      actual = actual.sig;
+      actual = actual.next;
     }
     return l.toString();
   }
 
   private class ListaIterador implements Iterador<T> {
-    private int dedito;
+    private int puntero;
 
     public ListaIterador() {
-      dedito = 0;
+      puntero = 0;
     }
 
     public boolean haySiguiente() {
-      return dedito < largo;
+      return puntero < largo;
 
     }
 
     public boolean hayAnterior() {
-      if (dedito == 0) {
+      if (puntero == 0) {
         return false;
       } else {
         return true;
@@ -191,20 +185,20 @@ public class ListaEnlazada<T> implements Secuencia<T> {
 
     public T siguiente() {
       Nodo actual = primero;
-      for (int i = 0; i < dedito; i++) {
-        actual = actual.sig;
+      for (int i = 0; i < puntero; i++) {
+        actual = actual.next;
       }
-      dedito += 1;
+      puntero += 1;
       return actual.valor;
 
     }
 
     public T anterior() {
       Nodo actual = ultimo;
-      for (int i = largo; i > dedito; i--) {
-        actual = actual.ant;
+      for (int i = largo; i > puntero; i--) {
+        actual = actual.prev;
       }
-      dedito -= 1;
+      puntero -= 1;
       return actual.valor;
     }
   }

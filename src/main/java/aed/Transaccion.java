@@ -32,19 +32,15 @@ public class Transaccion implements Comparable<Transaccion> {
 
   @Override
   public boolean equals(Object otro) {
-    if (this == otro) {
+    if (this == otro)
       return true;
-    }
-    if (otro == null || getClass() != otro.getClass()) {
+    if (otro == null || getClass() != otro.getClass())
       return false;
-    }
-
-    Transaccion t = (Transaccion) otro;
-
-    return this.id == t.id &&
-        this.id_comprador == t.id_comprador &&
-        this.id_vendedor == t.id_vendedor &&
-        this.monto == t.monto;
+    Transaccion that = (Transaccion) otro;
+    return id == that.id &&
+        id_comprador == that.id_comprador &&
+        id_vendedor == that.id_vendedor &&
+        monto == that.monto;
   }
 
   public int monto() {
