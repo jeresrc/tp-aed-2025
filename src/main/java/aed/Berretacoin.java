@@ -130,11 +130,10 @@ public class Berretacoin<T extends Comparable<T>> {
     int cardinal = ultimo_bloque.cardinal();
     if (cardinal == 0) {
       return 0;
-    } else if (cant_bloques < 3000 && cardinal > 1) {
-      return this.monto_bloque / (cardinal - 1);
-    } else {
-      return this.monto_bloque / cardinal;
     }
+
+    int divisor = (cant_bloques < 3000 && cardinal > 1) ? cardinal - 1 : cardinal;
+    return this.monto_bloque / divisor;
   }
 
   private void revertirTransaccion(Transaccion transaccion) {
