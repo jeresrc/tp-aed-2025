@@ -15,19 +15,8 @@ public class Transaccion implements Comparable<Transaccion> {
 
   @Override
   public int compareTo(Transaccion otro) {
-    if (this.monto > otro.monto) {
-      return 1;
-    } else if (this.monto == otro.monto) {
-      if (this.id > otro.id) {
-        return 1;
-      } else if (this.id < otro.id) {
-        return -1;
-      } else {
-        return 0;
-      }
-    } else {
-      return -1;
-    }
+    int comparacionMonto = Integer.compare(this.monto, otro.monto);
+    return comparacionMonto != 0 ? comparacionMonto : Integer.compare(this.id, otro.id);
   }
 
   @Override

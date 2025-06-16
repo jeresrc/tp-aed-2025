@@ -17,6 +17,14 @@ public class ListaEnlazada<T> implements Secuencia<T> {
     }
   }
 
+  public ListaEnlazada(ListaEnlazada<T> lista) {
+    Nodo actual = lista.primero;
+    while (actual != null) {
+      agregarAtras(actual.valor);
+      actual = actual.next;
+    }
+  }
+
   public ListaEnlazada() {
     primero = null;
     ultimo = null;
@@ -87,7 +95,7 @@ public class ListaEnlazada<T> implements Secuencia<T> {
 
   public void eliminarPorNodo(Nodo nodo) {
     if (largo == 0 || nodo == null) {
-      throw new UnsupportedOperationException("No se puede eliminar este nodo");
+      throw new UnsupportedOperationException("No existen nodos en la lista");
     }
 
     Nodo anterior = nodo.prev;
@@ -136,31 +144,6 @@ public class ListaEnlazada<T> implements Secuencia<T> {
     }
     actual.valor = elem;
 
-  }
-
-  public ListaEnlazada(ListaEnlazada<T> lista) {
-    Nodo actual = lista.primero;
-    while (actual != null) {
-      agregarAtras(actual.valor);
-      actual = actual.next;
-    }
-  }
-
-  @Override
-  public String toString() {
-    Nodo actual = primero;
-    StringBuilder l = new StringBuilder();
-    while (actual != null) {
-      if (actual.next == null) {
-        l.append(actual.valor + "]");
-      } else if (actual == primero) {
-        l.append("[" + actual.valor + ", ");
-      } else {
-        l.append(actual.valor + ", ");
-      }
-      actual = actual.next;
-    }
-    return l.toString();
   }
 
   private class ListaIterador implements Iterador<T> {

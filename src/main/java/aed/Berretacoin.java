@@ -24,12 +24,12 @@ public class Berretacoin<T extends Comparable<T>> {
       return valor;
     }
 
-    public void actualizarValor(Nodo nuevoValor) {
-      this.valor = nuevoValor;
+    public void actualizarValor(Nodo valor) {
+      this.valor = valor;
     }
   }
 
-  public Berretacoin(int n_usuarios) {// Loop de O(p) + heapify O(p) = O(p)
+  public Berretacoin(int n_usuarios) {
     this.monto_bloque = 0;
     this.cant_bloques = 0;
 
@@ -91,7 +91,7 @@ public class Berretacoin<T extends Comparable<T>> {
       }
     }
 
-    this.ultimo_bloque.heapify(trans); // Convierto mi trans en un heap con complejidad Lineal O(n)
+    this.ultimo_bloque.heapify(trans); // O(n)
     this.cant_bloques++;
 
   }
@@ -130,8 +130,7 @@ public class Berretacoin<T extends Comparable<T>> {
     }
   }
 
-  public void hackearTx() { // Elimina max del heap (O(log nb)) y actualiza dos heaps (O(log p) c/u)
-
+  public void hackearTx() {
     Transaccion maximo = ultimo_bloque.verMax();
     ultimo_bloque.eliminarMax(); // O(log nb)
 
