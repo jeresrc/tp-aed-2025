@@ -58,11 +58,11 @@ public class Berretacoin<T extends Comparable<T>> {
     Heap.Handle<Usuario> handle = usuarios.getHandle(usuario_temp);
     Usuario usuario = handle.valor();
 
-    int nuevo_salgo = usuario.saldo() + cambioMonto;
-    Usuario usuario_actualizado = new Usuario(usuario.usuario(), nuevo_salgo);
+    int nuevo_saldo = usuario.saldo() + cambioMonto;
+    Usuario usuario_actualizado = new Usuario(usuario.usuario(), nuevo_saldo);
     usuarios.actualizar(handle, usuario_actualizado);
 
-    saldos[idUsuario - 1] = nuevo_salgo;
+    saldos[idUsuario - 1] = nuevo_saldo;
   }
 
   private void procesarTransaccion(Transaccion transaccion, int indice) {
