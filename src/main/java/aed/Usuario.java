@@ -6,10 +6,9 @@ public class Usuario implements Comparable<Usuario> {
   private IHandle<Usuario> handle;
 
   public Usuario(int id, int saldo) {
-
     this.id = id;
     this.saldo = saldo;
-    this.handle = new Handle<>(this, this.id);
+    this.handle = new Handle<>(this, id);
   }
 
   public IHandle<Usuario> handle() {

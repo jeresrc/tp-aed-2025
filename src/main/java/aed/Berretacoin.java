@@ -10,7 +10,7 @@ public class Berretacoin<T extends Comparable<T>> {
   private int cant_bloques;
 
   private ListaEnlazada<Transaccion> transacciones_copia;
-  private ArrayList<IHandle<Usuario>> lista_handles_usuarios; // lista de handles para poder modificar
+  private IHandle<Usuario>[] lista_handles_usuarios;
   private ArrayList<IHandle<ListaEnlazada<Transaccion>>> lista_handles_transacciones; // lista de handles para poder
                                                                                       // modificar
   // la listaEnlazada en O(1)
@@ -24,13 +24,14 @@ public class Berretacoin<T extends Comparable<T>> {
   public Berretacoin(int n_usuarios) {
     this.monto_bloque = 0; // O(1)
     this.cant_bloques = 0; // O(1)
+    this.lista_handles_usuarios = new IHandle[n_usuarios + 1]; // O(1)
 
     ArrayList<Usuario> lista_usuarios = new ArrayList<>(); // O(1)
-    this.lista_handles_usuarios = new ArrayList<>(); // O(1)
 
-    for (int i = 0; i < n_usuarios; i++) { // O(P)
-      Usuario user = new Usuario(i + 1, 0); // O(1) porque usuarios no pueden tener id negativo.
-      lista_usuarios.add(user);
+    for (int i = 1; i <= n_usuarios; i++) { // O(P)
+      Usuario usuario = new Usuario(i, 0); // O(1) porque usuarios no pueden tener id negativo.
+      lista_usuarios.add(usuario);
+      lista_handles_usuarios[i] = usuario.handle();
     }
 
     this.usuarios = new Heap<>(); // O(1)
@@ -47,19 +48,13 @@ public class Berretacoin<T extends Comparable<T>> {
   }
 
   private void actualizarSaldoUsuario(IHandle<Usuario> handleUsuario, int cambioMonto) { // es una funcion auxiliar que
-                                                                                         // actualiza
-    // el saldo de un usuario en mi heap
-    // O(P)
-    int idUsuario = handleUsuario.valor().usuario();
     int saldo_actual = handleUsuario.valor().saldo();
 
-    Usuario usuario_temp = new Usuario(idUsuario, saldo_actual); // O(1)
-
     int nuevo_saldo = saldo_actual + cambioMonto; // O(1)
-    Usuario usuario_actualizado = new Usuario(nuevo_saldo, nuevo_saldo); // O(1)
+    handleUsuario.valor().setSaldo(nuevo_saldo); // O(1)
 
-    usuarios.actualizar(handleUsuario, usuario_actualizado); // O(log P) porque esa es la complejidad de actualizar
-    saldos[idUsuario - 1] = nuevo_saldo; // O(1)
+    usuarios.actualizar(handleUsuario, handleUsuario.valor()); // O(log P) porque la
+                                                               // altura es log P
   }
 
   private void procesarTransaccion(Transaccion transaccion, int indice) { // es una funcion auxiliar
@@ -68,16 +63,19 @@ public class Berretacoin<T extends Comparable<T>> {
     // PROBLEMA!! O(1)
     // no usamos indice
     lista_handles_transacciones.add(handle); // N agregamos el handle del nodo al arra de lista_handles_transacciones en
-                                             // O(1)
 
     int comprador = transaccion.id_comprador(); // O(1)
     int vendedor = transaccion.id_vendedor(); // O(1)
     int monto = transaccion.monto(); // O(1)
 
+    IHandle<Usuario> handleComprador = lista_handles_usuarios[comprador];
+    IHandle<Usuario> handleVendedor = lista_handles_usuarios[vendedor];
+
     if (comprador != 0) {
-      actualizarSaldoUsuario(handle, -monto); // O(P)
+      actualizarSaldoUsuario(handleComprador, -monto); // O(P)
     }
-    actualizarSaldoUsuario(handle, monto); // O(P)
+
+    actualizarSaldoUsuario(handleVendedor, monto); // O(P)
     // la complejidad es O(P)
   }
 
@@ -148,10 +146,14 @@ public class Berretacoin<T extends Comparable<T>> {
     int vendedor = transaccion.id_vendedor(); // O(1)
     int monto = transaccion.monto(); // O(1)
 
+    IHandle<Usuario> handleComprador = lista_handles_usuarios[comprador];
+    IHandle<Usuario> handleVendedor = lista_handles_usuarios[vendedor];
+
     if (comprador != 0) { // O(1)
-      actualizarSaldoUsuario(comprador, monto); // O(P)
+      actualizarSaldoUsuario(handleComprador, monto); // O(P)
     }
-    actualizarSaldoUsuario(vendedor, -monto); // O(P)
+
+    actualizarSaldoUsuario(handleVendedor, -monto); // O(P)
     // la complejidad es O(P)
   }
 
@@ -163,9 +165,10 @@ public class Berretacoin<T extends Comparable<T>> {
 
     monto_bloque -= transaccion_maxima.monto(); // O(1)
 
-    IHandle<ListaEnlazada<Transaccion>.Nodo> handleDelNodo = lista_handles_transacciones.get(transaccion_maxima.id()); // O(1)
-    ListaEnlazada<Transaccion>.Nodo nodoAeliminar = handleDelNodo.valor(); // O(1)
-    transacciones_copia.eliminarPorNodo(nodoAeliminar);// O(1)
+    // IHandle<ListaEnlazada<Transaccion>> handleDelNodo =
+    // lista_handles_transacciones.get(transaccion_maxima.id()); // O(1)
+    // ListaEnlazada<Transaccion>.nodoAeliminar = handleDelNodo.valor(); // O(1)
+    // transacciones_copia.eliminarPorNodo(nodoAeliminar);// O(1)
     // la complejidad es O(nb + P)
   }
 }

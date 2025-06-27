@@ -84,7 +84,7 @@ public class Heap<T extends Comparable<T>> {
     // O(n log n)
   }
 
-  public void actualizar(Handle<T> handle, T nuevoValor) {
+  public void actualizar(IHandle<T> handle, T nuevoValor) {
     int i = handle.posicion(); // O(1)
     T viejoValor = elementos.get(i); // O(1)
     handles.get(i).actualizarValor(nuevoValor); // handles es una array de handle, obtengo el elemento con posicion i
