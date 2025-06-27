@@ -3,10 +3,17 @@ package aed;
 public class Usuario implements Comparable<Usuario> {
   private int id;
   private int saldo;
+  private IHandle<Usuario> handle;
 
   public Usuario(int id, int saldo) {
+
     this.id = id;
     this.saldo = saldo;
+    this.handle = new Handle<>(this, this.id);
+  }
+
+  public IHandle<Usuario> handle() {
+    return handle;
   }
 
   public int usuario() {
@@ -36,4 +43,31 @@ public class Usuario implements Comparable<Usuario> {
     Usuario usuario = (Usuario) obj;
     return id == usuario.id;
   }
+
+  public static class Handle<T> implements IHandle<T> {
+    private T valor;
+    private int posicion;
+
+    public Handle(T valor, int posicion) {
+      this.valor = valor;
+      this.posicion = posicion;
+    }
+
+    public T valor() {
+      return valor; // O(1)
+    }
+
+    public int posicion() {
+      return posicion; // O(1)
+    }
+
+    public void actualizarPosicion(int nuevaPos) {
+      this.posicion = nuevaPos; // O(1)
+    }
+
+    public void actualizarValor(T nuevoValor) {
+      this.valor = nuevoValor; // O(1)
+    }
+  }
+
 }

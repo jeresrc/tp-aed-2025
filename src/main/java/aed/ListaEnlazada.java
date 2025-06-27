@@ -5,6 +5,32 @@ public class ListaEnlazada<T> implements Secuencia<T> {
   private Nodo ultimo;
   private int largo;
 
+  public class Handle implements IHandle<T> {
+    private Nodo nodo;
+    private int posicion;
+
+    public Handle(Nodo nodo, int posicion) {
+      this.nodo = nodo;
+      this.posicion = posicion;
+    }
+
+    public T valor() {
+      return nodo.valor;
+    }
+
+    public int posicion() {
+      return posicion;
+    }
+
+    public void actualizarPosicion(int nuevaPos) {
+      this.posicion = nuevaPos;
+    }
+
+    public void actualizarValor(T nuevoValor) {
+      this.nodo.valor = nuevoValor;
+    }
+  }
+
   public class Nodo {
     T valor;
     Nodo next;
@@ -35,41 +61,11 @@ public class ListaEnlazada<T> implements Secuencia<T> {
     return largo;
   }
 
-  public void agregarAdelante(T elem) {
-    Nodo nuevo = new Nodo(elem);
-
-    if (primero == null) {
-      primero = nuevo;
-      ultimo = nuevo;
-      largo += 1;
-    }
-
-    else {
-      nuevo.next = primero;
-      primero = nuevo;
-      largo += 1;
-    }
-
-  }
-
-  public void agregarAtras(T elem) {
-    Nodo nuevo = new Nodo(elem);
-    if (primero == null) {
-      primero = nuevo;
-      ultimo = nuevo;
-    } else {
-      ultimo.next = nuevo;
-      nuevo.prev = ultimo;
-      ultimo = nuevo;
-    }
-    largo++;
-  }
-
   public Nodo primeroNodo() {
     return primero;
   }
 
-  public Nodo agregarAtrasAux(T elem) {
+  public Handle agregarAtras(T elem) {
     Nodo nuevo = new Nodo(elem);
     if (primero == null) {
       primero = nuevo;
@@ -81,7 +77,8 @@ public class ListaEnlazada<T> implements Secuencia<T> {
     }
 
     largo++;
-    return nuevo;
+
+    return new Handle(nuevo, largo - 1);
   }
 
   public T obtener(int i) { // O(n)
@@ -91,6 +88,11 @@ public class ListaEnlazada<T> implements Secuencia<T> {
     }
 
     return actual.valor;
+  }
+
+  public void eliminarPorHandle(IHandle<Nodo> handle) {
+    Nodo nodo = handle.valor();
+    eliminarPorNodo(nodo);
   }
 
   public void eliminarPorNodo(Nodo nodo) {
